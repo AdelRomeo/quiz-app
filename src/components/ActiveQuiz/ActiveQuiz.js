@@ -5,17 +5,19 @@ import AnswersList from "../AnswersList/AnswersList";
 import classes from './ActiveQuiz.module.scss'
 
 //компонент активного вопроса
-const ActiveQuiz = ({answers}) => (
+const ActiveQuiz = ({answers, question, answerNumber, quizLength, onAnswerClick, state}) => (
   <div className={classes.ActiveQuiz}>
     <p className={classes.Question}>
       <span>
-        <strong>2 </strong>
-        Как дела?
+        <strong>{answerNumber}. </strong>
+        {question}
       </span>
-      <small>2 из 7</small>
+      <small>{`${answerNumber} из ${quizLength}`}</small>
     </p>
     <AnswersList
       answers={answers}
+      onAnswerClick={onAnswerClick}
+      state={state}
     />
   </div>
 )

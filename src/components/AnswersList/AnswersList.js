@@ -5,11 +5,16 @@ import AnswersItem from "../AnswersItem/AnswersItem";
 //стили
 import classes from './AnswersList.module.scss'
 
-const AnswersList = ({answers}) => (
+const AnswersList = ({answers, onAnswerClick, state}) => (
   <ul className={classes.AnswersList}>
-    {answers.map((answer, index) => {
+    {answers.map(answer => {
       return(
-          <AnswersItem key={index} answer={answer}/>
+          <AnswersItem
+            key={answer.id}
+            answer={answer}
+            onAnswerClick={onAnswerClick}
+            state={state ? state[answer.id] : null}
+          />
         )
     })}
   </ul>

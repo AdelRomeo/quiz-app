@@ -1,12 +1,18 @@
 import React, {Component} from 'react'
+//контейнер всего приложения
+import Layout from "./hoc/Layout/Layout";
+//комноненты
+import Quiz from "./containers/Quiz/Quiz";
+
+//стили
 import classes from './App.module.scss';
 
 class App extends Component {
   render() {
     return (
-      <div>
-        1
-      </div>
+      <Layout>
+        <Quiz/>
+      </Layout>
     );
   }
 }

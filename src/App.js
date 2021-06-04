@@ -1,8 +1,12 @@
-import React, {Component} from 'react'
+import React, {Component} from 'react';
+import {Route, Switch} from 'react-router-dom';
 //контейнер всего приложения
 import Layout from "./hoc/Layout/Layout";
 //комноненты
 import Quiz from "./containers/Quiz/Quiz";
+import QuizCreator from "./containers/QuizCreator/QuizCreator";
+import QuizList from "./containers/QuizList/QuizList";
+import Auth from "./containers/Auth/Auth";
 
 //стили
 import classes from './App.module.scss';
@@ -11,7 +15,12 @@ class App extends Component {
   render() {
     return (
       <Layout>
-        <Quiz/>
+        <Switch>
+          <Route path='/auth' component={Auth}/>
+          <Route path='/quiz-creator' component={QuizCreator}/>
+          <Route path='/quiz/:id' component={Quiz}/>
+          <Route path='/' component={QuizList}/>
+        </Switch>
       </Layout>
     );
   }

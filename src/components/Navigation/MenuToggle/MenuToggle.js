@@ -3,6 +3,7 @@ import React from 'react';
 //стили
 import classes from './MenuToggle.module.scss'
 
+//компонент кнопки. показ/скрытие меню
 const MenuToggle = ({onToggle, isOpen}) => {
 
   const cls = [classes.MenuToggle ,'fa']

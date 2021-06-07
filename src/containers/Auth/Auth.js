@@ -14,6 +14,8 @@ function validateEmail(email) {
 export default class Auth extends Component {
 
   state = {
+    //валидна ли форма
+    isFormValid: false,
     //инпуты
     formControls: {
       email: {
@@ -64,6 +66,7 @@ export default class Auth extends Component {
     e.preventDefault()
   }
 
+  //изменение значения поля в input'e
   onChangeHandler = (event, controlName) => {
     //копия объекта из state
     const formControls = {...this.state.formControls}
@@ -73,16 +76,23 @@ export default class Auth extends Component {
     //задаем значение в поле input
     control.value = event.target.value;
     //флаг того что с инпутом взаимдействовали
-    control.touched = true
+    control.touched = true;
     //прошли ли валидация
-    control.valid = this.validateControl(control.value, control.validation)
+    control.valid = this.validateControl(control.value, control.validation);
 
     //изменяем элемент в копии из state
-    formControls[controlName] = control
+    formControls[controlName] = control;
+
+    let isFormValid = true;
+
+    //проверка всех инпутов на валидность
+    Object.keys(formControls).forEach(name =>{
+      isFormValid = formControls[name].valid;
+    })
 
     //изменяем state
     this.setState({
-      formControls
+      formControls, isFormValid
     })
   }
 
@@ -99,16 +109,16 @@ export default class Auth extends Component {
     let isValid = true;
 
     //если есть validation.required (есть ли что то в строке input'a)
-    if (validation.required){
+    if (validation.required) {
       //если строка в input'e не пустая и до этого значение isValid не false то isValid - true
       isValid = value.trim() !== '' && isValid;
     }
     //если есть validation.email
-    if (validation.email){
+    if (validation.email) {
       isValid = validateEmail(value) && isValid
     }
     //если есть validation.minLength
-    if (validation.minLength){
+    if (validation.minLength) {
       //если длина строки в input'e больше или равно 6 и до этого значение isValid не false то isValid - true
       isValid = value.length >= validation.minLength && isValid;
     }
@@ -144,8 +154,8 @@ export default class Auth extends Component {
           <h1>Авторизация</h1>
           <form action="" onSubmit={this.submitHandler} className={classes.AuthForm}>
             {this.renderInputs()}
-            <Button type='success' onClick={this.LoginHandler}>Войти</Button>
-            <Button type='primary' onClick={this.RegisterHandler}>Зарегистрироваться</Button>
+            <Button disabled={!this.state.isFormValid} type='success' onClick={this.LoginHandler}>Войти</Button>
+            <Button disabled={!this.state.isFormValid} type='primary' onClick={this.RegisterHandler}>Зарегистрироваться</Button>
           </form>
         </div>
       </div>

@@ -34,7 +34,6 @@ const Input = (props) => {
 //проверка валидности инпута
 const isInvalid = ({valid, touched, shouldValidation}) => {
   //возвращаем true если input не валидный и он должен валидироваться и с ним уже взаимодействовали
-  console.log(!valid,shouldValidation,touched)
   return !valid && shouldValidation && touched
 }
 

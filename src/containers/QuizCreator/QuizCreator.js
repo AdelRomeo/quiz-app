@@ -1,7 +1,7 @@
 import React, {Component, Fragment} from 'react';
 //компоненты
 import Button from "../../components/UI/Button/Button";
-import {createControl} from '../../form/formFramework';
+import {createControl, validate, validateForm} from '../../form/formFramework';
 import Input from "../../components/UI/Input/Input";
 import Select from "../../components/UI/Select/Select";
 //стили
@@ -34,9 +34,12 @@ function createFormControls() {
 export default class QuizCreator extends Component {
 
   state = {
-    rightAnswerId: 1,
     //список вопросов
     quiz: [],
+    //прошла ли форма валидацию
+    isFormValid: false,
+    //выбранный правильный вариант ответа при создании вопроса
+    rightAnswerId: 1,
     //инпуты
     formControls: createFormControls()
   }
@@ -47,18 +50,74 @@ export default class QuizCreator extends Component {
   }
 
   //добавление вопроса
-  addQuestionHandler = () => {
+  addQuestionHandler= (e) => {
+    e.preventDefault()
+
+    //копия списка созданных вопросов
+    const quiz = [...this.state.quiz];
+    const index = quiz.length + 1;
+
+    const {question, option1, option2, option3, option4} = this.state.formControls
+
+    //элемент вопроса со всем данными
+    const questionItem = {
+      //текст вопроса
+      question: question.value,
+      id: index,
+      //номер правильного ответа
+      rightAnswerId: this.state.rightAnswerId,
+      //варианты ответа
+      answers: [
+        {text: option1.value, id: option1.id},
+        {text: option2.value, id: option2.id},
+        {text: option3.value, id: option3.id},
+        {text: option4.value, id: option4.id},
+      ]
+    }
+
+    //добавляем готовый элемент вопроса в клон state
+    quiz.push(questionItem);
+
+    //изменение state
+    this.setState({
+      quiz,
+      //прошла ли форма валидацию
+      isFormValid: false,
+      //выбранный правильный вариант ответа при создании вопроса
+      rightAnswerId: 1,
+      //инпуты
+      formControls: createFormControls()
+    })
 
   }
 
-  //изменение в поле input'a
+  //изменение в поле input'a (варинаты ответа)
   changeHandler = (value, controlName) => {
+    //копия объекта из state
+    const formControls = {...this.state.formControls}
+    //копия одного эемента из объекта (this.state.formControls.email или this.state.formControls.password)
+    const control = {...formControls[controlName]}
 
+    //с контролом взаимодействовали
+    control.touched = true;
+    //отображение записи в поле инпута
+    control.value = value;
+    //прошел ли контрол валидацию
+    control.valid = validate(control.value, control.validation);
+
+    //изменяем элемент в копии из state
+    formControls[controlName] = control;
+
+    this.setState({
+      formControls,
+      isFormValid: validateForm(formControls)
+    })
   }
 
   //создание теста
-  createQuizHandler = () => {
-
+  createQuizHandler = (event) => {
+    event.preventDefault()
+    console.log(this.state.quiz)
   }
 
   //рендпер инпутов
@@ -85,8 +144,12 @@ export default class QuizCreator extends Component {
     })
   }
 
-  selectChangeHandler = (event)=>{
-    console.log(event.target.value)
+  //выбор варианта ответа
+  selectChangeHandler = (event) => {
+    this.setState({
+      //визуальное отображение выбранного варианта
+      rightAnswerId: event.target.value
+    })
   }
 
   render() {
@@ -100,7 +163,7 @@ export default class QuizCreator extends Component {
         {text: 2, value: 2},
         {text: 3, value: 3},
         {text: 4, value: 4}
-        ]}
+      ]}
     />
 
     return (
@@ -115,13 +178,15 @@ export default class QuizCreator extends Component {
 
             <Button
               type='primary'
-              onClick={this.createQuizHandler}
+              onClick={this.addQuestionHandler}
+              disabled={!this.state.isFormValid}
             >
               Добавить вопрос
             </Button>
             <Button
               type='success'
-              onClick={this.addQuestionHandler}
+              onClick={this.createQuizHandler}
+              disabled={this.state.quiz.length === 0}
             >
               Создать тест
             </Button>

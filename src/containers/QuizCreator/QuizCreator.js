@@ -4,6 +4,7 @@ import Button from "../../components/UI/Button/Button";
 import {createControl, validate, validateForm} from '../../form/formFramework';
 import Input from "../../components/UI/Input/Input";
 import Select from "../../components/UI/Select/Select";
+import axios from "axios";
 //стили
 import classes from './QuizCreator.module.scss';
 
@@ -50,7 +51,7 @@ export default class QuizCreator extends Component {
   }
 
   //добавление вопроса
-  addQuestionHandler= (e) => {
+  addQuestionHandler = (e) => {
     e.preventDefault()
 
     //копия списка созданных вопросов
@@ -114,10 +115,30 @@ export default class QuizCreator extends Component {
     })
   }
 
-  //создание теста
-  createQuizHandler = (event) => {
+  //создание и отправка теста на сервер
+  createQuizHandler = async (event) => {
     event.preventDefault()
-    console.log(this.state.quiz)
+
+    try {
+      //отправляем данные на сервер
+      await axios.post('https://quiz-app-n-e2d41-default-rtdb.europe-west1.firebasedatabase.app/quizes.json', this.state.quiz)
+      this.setState({
+        quiz: [],
+        //прошла ли форма валидацию
+        isFormValid: false,
+        //выбранный правильный вариант ответа при создании вопроса
+        rightAnswerId: 1,
+        //инпуты
+        formControls: createFormControls()
+      })
+    } catch (e) {
+      console.log(e)
+    }
+    //создание в базе данных
+    //адрес куда передаем и что передаем
+    // axios.post('https://quiz-app-n-e2d41-default-rtdb.europe-west1.firebasedatabase.app/quizes.json', this.state.quiz)
+    //   .then(response => console.log(response))
+    //   .catch(error => console.log(error))
   }
 
   //рендпер инпутов

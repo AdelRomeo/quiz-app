@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 //компоненты
 import Button from "../../components/UI/Button/Button";
 import Input from "../../components/UI/Input/Input";
+import axios from 'axios';
 //стили
 import classes from './Auth.module.scss';
 
@@ -52,12 +53,37 @@ export default class Auth extends Component {
   }
 
   //авторизация
-  LoginHandler = () => {
-
+  LoginHandler = async () => {
+    //создание объекта для конфигурации отправляемых данных
+    const authData = {
+      email: this.state.formControls.email.value,
+      password: this.state.formControls.password.value,
+      returnSecureToken: true
+    }
+    try {
+      //отправка данных на сервер
+      const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBgoTIrbMXM2NfSy3B64Kg7B07_S6JVA0I', authData)
+      console.log(response)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   //регистрация
-  RegisterHandler = () => {
+  RegisterHandler = async () => {
+    //создание объекта для конфигурации отправляемых данных
+    const authData = {
+      email: this.state.formControls.email.value,
+      password: this.state.formControls.password.value,
+      returnSecureToken: true
+    }
+    try {
+      //отправка данных на сервер
+      const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBgoTIrbMXM2NfSy3B64Kg7B07_S6JVA0I', authData)
+      console.log(response)
+    } catch (e) {
+      console.log(e)
+    }
 
   }
 
@@ -86,7 +112,7 @@ export default class Auth extends Component {
     let isFormValid = true;
 
     //проверка всех инпутов на валидность
-    Object.keys(formControls).forEach(name =>{
+    Object.keys(formControls).forEach(name => {
       isFormValid = formControls[name].valid;
     })
 

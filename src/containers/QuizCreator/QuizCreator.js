@@ -4,7 +4,7 @@ import Button from "../../components/UI/Button/Button";
 import {createControl, validate, validateForm} from '../../form/formFramework';
 import Input from "../../components/UI/Input/Input";
 import Select from "../../components/UI/Select/Select";
-import axios from "axios";
+import axios from "../../axios/axios-quiz";
 //стили
 import classes from './QuizCreator.module.scss';
 
@@ -66,7 +66,7 @@ export default class QuizCreator extends Component {
       question: question.value,
       id: index,
       //номер правильного ответа
-      rightAnswerId: this.state.rightAnswerId,
+      rightAnswerId: +this.state.rightAnswerId,
       //варианты ответа
       answers: [
         {text: option1.value, id: option1.id},
@@ -121,7 +121,7 @@ export default class QuizCreator extends Component {
 
     try {
       //отправляем данные на сервер
-      await axios.post('https://quiz-app-n-e2d41-default-rtdb.europe-west1.firebasedatabase.app/quizes.json', this.state.quiz)
+      await axios.post('/quizes.json', this.state.quiz)
       this.setState({
         quiz: [],
         //прошла ли форма валидацию

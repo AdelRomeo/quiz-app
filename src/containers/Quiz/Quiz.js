@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 //компоненты
 import ActiveQuiz from "../../components/ActiveQuiz/ActiveQuiz";
 import FinishedQuiz from "../../components/FinishedQuiz/FinishedQuiz";
+import Loader from "../../components/UI/Loader/Loader";
+import axios from '../../axios/axios-quiz'
 //стили
 import classes from './Quiz.module.scss';
 
@@ -17,36 +19,8 @@ export default class Quiz extends Component {
     //правильынй или не правильный ответ
     answerState: null,
     //список вопросов
-    quiz: [
-      {
-        //вопрос
-        question: 'Какого цвета небо?',
-        //вариант правильного ответа
-        rightAnswerId: 2,
-        id: 1,
-        //варианты ответа
-        answers: [
-          {text: 'Черный', id: 1},
-          {text: 'Синий', id: 2},
-          {text: 'Красный', id: 3},
-          {text: 'Зеленый', id: 4}
-        ]
-      },
-      {
-        //вопрос
-        question: 'Какое число больше?',
-        //вариант правильного ответа
-        rightAnswerId: 3,
-        id: 2,
-        //варианты ответа
-        answers: [
-          {text: 20, id: 1},
-          {text: 33, id: 2},
-          {text: 129, id: 3},
-          {text: 7, id: 4}
-        ]
-      }
-    ]
+    quiz: [],
+    loading: true
   }
 
   //клики по вариантам ответа
@@ -68,7 +42,7 @@ export default class Quiz extends Component {
     const results = this.state.results;
 
     //если правильный вариант равен варианту ответа на который кликнули
-    if (question.rightAnswerId === answerId) {
+    if (+question.rightAnswerId === answerId) {
       //добавляем в результаты данные о неправильном ответе
       results[question.id] = 'success'
       this.setState({
@@ -123,30 +97,49 @@ export default class Quiz extends Component {
     })
   }
 
+  //когда дом дерево готово
+  async componentDidMount() {
+    try {
+      //запрос к сервера за списком вопросов
+      const response = await axios.get(`/quizes/${this.props.match.params.id}.json`)
+      this.setState({
+        quiz: response.data,
+        loading: false
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   render() {
 
     const {quiz, activeQuestion, answerState, results} = this.state
+
+    console.log(quiz)
 
     return (
       <div className={classes.Quiz}>
         <div className={classes.QuizWrapper}>
           <h1>Ответьте на все вопросы</h1>
           {
-            this.state.isFinished
-              ? <FinishedQuiz
-                results={results}
-                quiz={quiz}
-                onRetry={this.onRetryHandler}
-              />
-              : <ActiveQuiz
-                answers={quiz[activeQuestion].answers}
-                question={quiz[activeQuestion].question}
-                quizLength={quiz.length}
-                onAnswerClick={this.onAnswerClickHandler}
-                answerNumber={activeQuestion + 1}
-                state={answerState}
-              />
+            this.state.loading
+              ? <Loader/>
+              : this.state.isFinished
+                  ? <FinishedQuiz
+                    results={results}
+                    quiz={quiz}
+                    onRetry={this.onRetryHandler}
+                  />
+                  : <ActiveQuiz
+                    answers={quiz[activeQuestion].answers}
+                    question={quiz[activeQuestion].question}
+                    quizLength={quiz.length}
+                    onAnswerClick={this.onAnswerClickHandler}
+                    answerNumber={activeQuestion + 1}
+                    state={answerState}
+                  />
           }
+
         </div>
       </div>
     )

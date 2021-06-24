@@ -1,5 +1,5 @@
 import axios from '../../axios/axios-quiz'
-import {FETCH_QUIZES_ERROR, FETCH_QUIZES_START, FETCH_QUIZES_SUCCESS} from "./actionTypes";
+import {FETCH_QUIZ_SUCCESS, FETCH_QUIZES_ERROR, FETCH_QUIZES_START, FETCH_QUIZES_SUCCESS} from "./actionTypes";
 
 //загрузка списка тестов
 export function fetchQuizes() {
@@ -16,7 +16,7 @@ export function fetchQuizes() {
           name: `Тест №${index + 1}`
         })
       })
-     dispatch(fetchQuizeSuccess(quizes))
+     dispatch(fetchQuizesSuccess(quizes))
     } catch (e) {
       dispatch(fetchQuizesError(e))
     }
@@ -31,7 +31,7 @@ export function fetchQuizesStart() {
 }
 
 //список загрузился
-export function fetchQuizeSuccess(quizes) {
+export function fetchQuizesSuccess(quizes) {
   return {
     type: FETCH_QUIZES_SUCCESS,
     quizes
@@ -43,5 +43,29 @@ export function fetchQuizesError(error) {
   return {
     type: FETCH_QUIZES_ERROR,
     error
+  }
+}
+
+
+//загрузка выбранного теста
+export function fetchQuiz(quizId) {
+  return async dispatch =>{
+    try {
+      dispatch(fetchQuizesStart())
+      //запрос к сервера за списком вопросов
+      const response = await axios.get(`/quizes/${quizId}.json`)
+      const quiz = response.data
+      dispatch(fetchQuizSuccess(quiz))
+    } catch (e) {
+      dispatch(fetchQuizesError(e))
+    }
+  }
+}
+
+//успешно загружен тест
+export function fetchQuizSuccess(quiz){
+  return{
+    type: FETCH_QUIZ_SUCCESS,
+    payload: quiz
   }
 }

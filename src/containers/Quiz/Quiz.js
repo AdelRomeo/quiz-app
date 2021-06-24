@@ -3,25 +3,12 @@ import React, {Component} from 'react';
 import ActiveQuiz from "../../components/ActiveQuiz/ActiveQuiz";
 import FinishedQuiz from "../../components/FinishedQuiz/FinishedQuiz";
 import Loader from "../../components/UI/Loader/Loader";
-import axios from '../../axios/axios-quiz'
+import {connect} from "react-redux";
+import {fetchQuiz} from "../../storeRedux/actions/quiz";
 //стили
 import classes from './Quiz.module.scss';
 
-export default class Quiz extends Component {
-
-  state = {
-    //результаты теста
-    results: {},
-    //закочился ли опрос
-    isFinished: false,
-    //номер вопроса который сейчас отрендерен
-    activeQuestion: 0,
-    //правильынй или не правильный ответ
-    answerState: null,
-    //список вопросов
-    quiz: [],
-    loading: true
-  }
+class Quiz extends Component {
 
   //клики по вариантам ответа
   onAnswerClickHandler = answerId => {
@@ -98,50 +85,64 @@ export default class Quiz extends Component {
   }
 
   //когда дом дерево готово
-  async componentDidMount() {
-    try {
-      //запрос к сервера за списком вопросов
-      const response = await axios.get(`/quizes/${this.props.match.params.id}.json`)
-      this.setState({
-        quiz: response.data,
-        loading: false
-      })
-    } catch (e) {
-      console.log(e)
-    }
+  componentDidMount() {
+    this.props.fetchQuiz(this.props.match.params.id)
   }
 
   render() {
 
-    const {quiz, activeQuestion, answerState, results} = this.state
+    const {quiz, activeQuestion, answerState, results, loading, isFinished} = this.props
 
-    console.log(quiz)
+    console.log(this.props)
 
     return (
       <div className={classes.Quiz}>
         <div className={classes.QuizWrapper}>
           <h1>Ответьте на все вопросы</h1>
           {
-            this.state.loading
+            loading || !quiz
               ? <Loader/>
-              : this.state.isFinished
-                  ? <FinishedQuiz
-                    results={results}
-                    quiz={quiz}
-                    onRetry={this.onRetryHandler}
-                  />
-                  : <ActiveQuiz
-                    answers={quiz[activeQuestion].answers}
-                    question={quiz[activeQuestion].question}
-                    quizLength={quiz.length}
-                    onAnswerClick={this.onAnswerClickHandler}
-                    answerNumber={activeQuestion + 1}
-                    state={answerState}
-                  />
+              : isFinished
+              ? <FinishedQuiz
+                results={results}
+                quiz={quiz}
+                onRetry={this.onRetryHandler}
+              />
+              : <ActiveQuiz
+                answers={quiz[activeQuestion].answers}
+                question={quiz[activeQuestion].question}
+                quizLength={quiz.length}
+                onAnswerClick={this.onAnswerClickHandler}
+                answerNumber={activeQuestion + 1}
+                state={answerState}
+              />
           }
-
         </div>
       </div>
     )
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    //результаты теста
+    results: state.quiz.results,
+    //закочился ли опрос
+    isFinished: state.quiz.isFinished,
+    //номер вопроса который сейчас отрендерен
+    activeQuestion: state.quiz.activeQuestion,
+    //правильынй или не правильный ответ
+    answerState: state.quiz.answerState,
+    //список вопросов
+    quiz: state.quiz.quiz,
+    loading: state.quiz.loader
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchQuiz: (id) => dispatch(fetchQuiz(id))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Quiz)

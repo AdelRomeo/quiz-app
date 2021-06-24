@@ -30,7 +30,6 @@ class QuizList extends Component {
   render() {
     return (
       <div className={classes.QuizList}>
-        {    console.log(this.props)}
         <div>
           <h1>Список тестов</h1>
           <ul>

@@ -75,7 +75,6 @@ export function answerClick(answerId) {
   return (dispatch, getState) => {
 
     const {answerState, quiz, results, activeQuestion} = getState().quiz
-    console.log(getState().quiz)
     //проверка есть ли какой то ответ
     if (answerState) {
       //заносим в переменную первый элемент из массива ответов

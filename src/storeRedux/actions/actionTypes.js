@@ -17,3 +17,8 @@ export const QUIZ_FINISHED = 'QUIZ_FINISHED'
 export const QUIZ_NOT_FINISHED = 'QUIZ_NOT_FINISHED'
 //клик по кнопке 'повторить'. переход к началу теста
 export const QUIZ_RETRY = 'QUIZ_RETRY'
+
+//добавление вопроса при создании
+export const ADD_QUESTION = 'ADD_QUESTION'
+//обнуление списка вопросов
+export const RESET_QUIZ = 'RESET_QUIZ'

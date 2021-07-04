@@ -4,9 +4,11 @@ import Button from "../../components/UI/Button/Button";
 import {createControl, validate, validateForm} from '../../form/formFramework';
 import Input from "../../components/UI/Input/Input";
 import Select from "../../components/UI/Select/Select";
-import axios from "../../axios/axios-quiz";
+import {connect} from "react-redux";
+import {Link} from 'react-router-dom'
 //стили
 import classes from './QuizCreator.module.scss';
+import {addQuestion, createQuiz} from "../../storeRedux/actions/create";
 
 //генерация данных для вариантов ответа
 function createOptionControl(number) {
@@ -32,11 +34,9 @@ function createFormControls() {
   }
 }
 
-export default class QuizCreator extends Component {
+class QuizCreator extends Component {
 
   state = {
-    //список вопросов
-    quiz: [],
     //прошла ли форма валидацию
     isFormValid: false,
     //выбранный правильный вариант ответа при создании вопроса
@@ -54,17 +54,13 @@ export default class QuizCreator extends Component {
   addQuestionHandler = (e) => {
     e.preventDefault()
 
-    //копия списка созданных вопросов
-    const quiz = [...this.state.quiz];
-    const index = quiz.length + 1;
-
     const {question, option1, option2, option3, option4} = this.state.formControls
 
     //элемент вопроса со всем данными
     const questionItem = {
       //текст вопроса
       question: question.value,
-      id: index,
+      id: this.props.quiz.length + 1,
       //номер правильного ответа
       rightAnswerId: +this.state.rightAnswerId,
       //варианты ответа
@@ -77,11 +73,10 @@ export default class QuizCreator extends Component {
     }
 
     //добавляем готовый элемент вопроса в клон state
-    quiz.push(questionItem);
+    this.props.addQuestion(questionItem)
 
     //изменение state
     this.setState({
-      quiz,
       //прошла ли форма валидацию
       isFormValid: false,
       //выбранный правильный вариант ответа при создании вопроса
@@ -117,28 +112,20 @@ export default class QuizCreator extends Component {
 
   //создание и отправка теста на сервер
   createQuizHandler = async (event) => {
-    event.preventDefault()
+    //event.preventDefault()
 
-    try {
-      //отправляем данные на сервер
-      await axios.post('/quizes.json', this.state.quiz)
-      this.setState({
-        quiz: [],
-        //прошла ли форма валидацию
-        isFormValid: false,
-        //выбранный правильный вариант ответа при создании вопроса
-        rightAnswerId: 1,
-        //инпуты
-        formControls: createFormControls()
-      })
-    } catch (e) {
-      console.log(e)
-    }
-    //создание в базе данных
-    //адрес куда передаем и что передаем
-    // axios.post('https://quiz-app-n-e2d41-default-rtdb.europe-west1.firebasedatabase.app/quizes.json', this.state.quiz)
-    //   .then(response => console.log(response))
-    //   .catch(error => console.log(error))
+    //отправляем данные на сервер
+    //await axios.post('/quizes.json', this.state.quiz)
+    this.props.createQuiz()
+
+    this.setState({
+      //прошла ли форма валидацию
+      isFormValid: false,
+      //выбранный правильный вариант ответа при создании вопроса
+      rightAnswerId: 1,
+      //инпуты
+      formControls: createFormControls()
+    })
   }
 
   //рендпер инпутов
@@ -204,16 +191,36 @@ export default class QuizCreator extends Component {
             >
               Добавить вопрос
             </Button>
-            <Button
-              type='success'
-              onClick={this.createQuizHandler}
-              disabled={this.state.quiz.length === 0}
-            >
-              Создать тест
-            </Button>
+            <Link to='/'>
+              <Button
+                type='success'
+                onClick={this.createQuizHandler}
+                disabled={this.props.quiz.length === 0}
+
+              >
+                Создать тест
+              </Button>
+            </Link>
           </form>
         </div>
       </div>
     )
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    quiz: state.create.quiz
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    //добавление вопроса
+    addQuestion: (item) => dispatch(addQuestion(item)),
+    //отправка теста на сервер
+    createQuiz: () => dispatch(createQuiz())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(QuizCreator)

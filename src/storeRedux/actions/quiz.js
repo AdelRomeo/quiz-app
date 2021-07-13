@@ -70,7 +70,7 @@ export function fetchQuizSuccess(quiz) {
   }
 }
 
-//клил по ванианту ответа
+//клил по варианту ответа
 export function answerClick(answerId) {
   return (dispatch, getState) => {
 

@@ -22,3 +22,8 @@ export const QUIZ_RETRY = 'QUIZ_RETRY'
 export const ADD_QUESTION = 'ADD_QUESTION'
 //обнуление списка вопросов
 export const RESET_QUIZ = 'RESET_QUIZ'
+
+//успешная авторизация/регистрация
+export const AUTH_SUCCESS = 'AUTH_SUCCESS'
+//разлогиниваемся
+export const AUTH_LOGOUT = 'AUTH_LOGOUT'

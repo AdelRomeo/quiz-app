@@ -5,6 +5,8 @@ import Input from "../../components/UI/Input/Input";
 import axios from 'axios';
 //стили
 import classes from './Auth.module.scss';
+import {connect} from "react-redux";
+import {auth} from "../../storeRedux/actions/auth";
 
 //валидация email
 function validateEmail(email) {
@@ -12,7 +14,7 @@ function validateEmail(email) {
   return re.test(String(email).toLowerCase());
 }
 
-export default class Auth extends Component {
+class Auth extends Component {
 
   state = {
     //валидна ли форма
@@ -54,37 +56,13 @@ export default class Auth extends Component {
 
   //авторизация
   LoginHandler = async () => {
-    //создание объекта для конфигурации отправляемых данных
-    const authData = {
-      email: this.state.formControls.email.value,
-      password: this.state.formControls.password.value,
-      returnSecureToken: true
-    }
-    try {
-      //отправка данных на сервер
-      const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBgoTIrbMXM2NfSy3B64Kg7B07_S6JVA0I', authData)
-      console.log(response)
-    } catch (e) {
-      console.log(e)
-    }
+    this.props.auth(this.state.formControls.email.value, this.state.formControls.password.value, true)
+
   }
 
   //регистрация
   RegisterHandler = async () => {
-    //создание объекта для конфигурации отправляемых данных
-    const authData = {
-      email: this.state.formControls.email.value,
-      password: this.state.formControls.password.value,
-      returnSecureToken: true
-    }
-    try {
-      //отправка данных на сервер
-      const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBgoTIrbMXM2NfSy3B64Kg7B07_S6JVA0I', authData)
-      console.log(response)
-    } catch (e) {
-      console.log(e)
-    }
-
+    this.props.auth(this.state.formControls.email.value, this.state.formControls.password.value, false)
   }
 
   //отмена действия по умолчанию формы
@@ -173,7 +151,6 @@ export default class Auth extends Component {
   }
 
   render() {
-
     return (
       <div className={classes.Auth}>
         <div>
@@ -188,3 +165,12 @@ export default class Auth extends Component {
     )
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    //авторизация/регистрация
+    auth: (email, password, isLogin)=> dispatch(auth(email, password, isLogin))
+  }
+}
+
+export default connect(null, mapDispatchToProps)(Auth)

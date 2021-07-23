@@ -4,17 +4,12 @@ import {NavLink} from 'react-router-dom'
 import Backdrop from "../../UI/Backdrop/Backdrop";
 //стили
 import classes from './Drawer.module.scss';
+import {connect} from "react-redux";
 
-const links = [
-  { to: '/', label: 'Список', exact: true},
-  { to: '/auth', label: 'Авторизация', exact: false},
-  { to: '/quiz-creator', label: 'Создать тест', exact: false},
-]
-
-export default class Drawer extends Component {
+class Drawer extends Component {
 
   //рендер пунктов меню
-  renderLinks() {
+  renderLinks(links) {
     return links.map((link, index) => {
       return (
         <li key={index}>
@@ -40,11 +35,29 @@ export default class Drawer extends Component {
       cls.push(classes.close)
     }
 
+
+    let links = [
+      {to: '/', label: 'Список', exact: true},
+    ]
+
+    //если авторизованны
+    if (this.props.isAuthenticated){
+      links.push(
+        {to: '/quiz-creator', label: 'Создать тест', exact: false},
+        {to: '/logout', label: 'Выйти', exact: false}
+      )
+      //если не авторизованны
+    } else {
+      links.push(
+        {to: '/auth', label: 'Авторизация', exact: false}
+      )
+    }
+
     return (
       <>
         <nav className={cls.join(' ')}>
           <ul>
-            {this.renderLinks()}
+            {this.renderLinks(links)}
           </ul>
 
         </nav>
@@ -53,3 +66,11 @@ export default class Drawer extends Component {
     )
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    isAuthenticated: state.auth.token
+  }
+}
+
+export default connect(mapStateToProps)(Drawer)

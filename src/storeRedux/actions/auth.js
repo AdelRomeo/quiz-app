@@ -52,7 +52,7 @@ function authLogout(time) {
   }
 }
 
-function logout() {
+export function logout() {
   //удаляем данные из localStorage
   localStorage.removeItem('token')
   localStorage.removeItem('userId')

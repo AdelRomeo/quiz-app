@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Route, Switch, withRouter} from 'react-router-dom';
+import {Redirect, Route, Switch, withRouter} from 'react-router-dom';
 //контейнер всего приложения
 import Layout from "./hoc/Layout/Layout";
 //комноненты
@@ -12,8 +12,13 @@ import Logout from "./containers/Logout/Logout";
 //стили
 import classes from './App.module.scss';
 import {connect} from "react-redux";
+import {autoLogin} from "./storeRedux/actions/auth";
 
 class App extends Component {
+
+  componentDidMount() {
+    this.props.autoLogin()
+  }
 
   render() {
 
@@ -22,7 +27,8 @@ class App extends Component {
       <Switch>
         <Route path='/auth' component={Auth}/>
         <Route path='/quiz/:id' component={Quiz}/>
-        <Route path='/' component={QuizList}/>
+        <Route path='/' exact component={QuizList}/>
+        <Redirect to='/'/>
       </Switch>
     )
 
@@ -33,12 +39,11 @@ class App extends Component {
           <Route path='/quiz-creator' component={QuizCreator}/>
           <Route path='/quiz/:id' component={Quiz}/>
           <Route path='/logout' component={Logout}/>
-          <Route path='/' component={QuizList}/>
+          <Route path='/' exact component={QuizList}/>
+          <Redirect to='/'/>
         </Switch>
       )
     }
-    console.log('auth', this.props.isAuthenticated)
-
     return (
       <Layout>
         {routs}
@@ -53,4 +58,10 @@ function mapStateToProps(state) {
   }
 }
 
-export default withRouter(connect(mapStateToProps)(App))
+function mapDispatchToProps(dispatch) {
+  return {
+    autoLogin: () => dispatch(autoLogin())
+  }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

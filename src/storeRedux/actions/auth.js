@@ -61,3 +61,26 @@ export function logout() {
     type: AUTH_LOGOUT
   }
 }
+
+//автологин
+export function autoLogin() {
+  return dispatch => {
+    //получаем токен из localStorage
+    const token = localStorage.getItem('token')
+    //если токена нет
+    if (!token) {
+      dispatch(logout())
+    } else {
+      //дата окончания сессии
+      const expirationDate = new Date(localStorage.getItem('expirationDate'))
+      //если дата окончаниии сесси меньше или равна дате на данный момент
+      if (expirationDate <= new Date()) {
+        dispatch(logout())
+      } else {
+        //логинимся в систему
+        dispatch(authSuccess(token))
+        dispatch(authLogout((expirationDate - new Date().getTime()) / 1000))
+      }
+    }
+  }
+}
